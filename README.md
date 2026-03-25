@@ -1,143 +1,226 @@
-"""
-analyzer.py — Tri-Layer Hybrid Forensic Authorship Agent
-Combines Word TF-IDF (Vocabulary), Char-WB TF-IDF (Syntax), and Bit-Level Profile Intersection (Micro).
-"""
+# 🧬 InkID — Linguistic Fingerprint Analyzer
 
-import re
-import numpy as np
-from collections import Counter
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+A stylometric authorship verification system that detects deepfake or impersonated text using a **hybrid NLP pipeline** combining:
 
-try:
-    import nltk
-    from nltk.corpus import stopwords as nltk_stopwords
-    from nltk.tokenize import sent_tokenize, word_tokenize
+* Word-level TF-IDF (vocabulary patterns)
+* Character-level n-grams (syntactic style)
+* Bit-level encoding fingerprints (micro-patterns)
 
-    def _ensure_nltk():
-        for res in ["stopwords", "punkt", "punkt_tab"]:
-            try: nltk.download(res, quiet=True)
-            except: pass
-    _ensure_nltk()
-    _HAS_NLTK = True
-except:
-    def sent_tokenize(text): return re.split(r"(?<=[.!?])\s+", text.strip())
-    def word_tokenize(text): return re.findall(r"\b[a-zA-Z']+\b", text)
+Built with **FastAPI** and a **modern dark UI powered by Tailwind CSS**.
 
-def extract_features(text: str) -> dict:
-    """Human-readable linguistic statistics for the UI."""
-    words = word_tokenize(text)
-    words_alpha = [w for w in words if re.match(r"^[a-zA-Z]+$", w)]
-    sentences = sent_tokenize(text)
+---
 
-    word_count = len(words_alpha)
-    sentence_count = max(len(sentences), 1)
-    unique_words = len(set(w.lower() for w in words_alpha))
+## 📁 Project Structure
 
-    return {
-        "word_count": word_count,
-        "sentence_count": sentence_count,
-        "avg_word_length": round(sum(len(w) for w in words_alpha) / max(word_count, 1), 2),
-        "avg_sentence_length": round(word_count / sentence_count, 2),
-        "unique_words": unique_words,
-        "vocabulary_richness": round(unique_words / max(word_count, 1), 3),
-        "punctuation_density": round(len(re.findall(r"[,;:!?]", text)) / max(word_count, 1), 3),
-    }
+```
+inkid/
+├── main.py              # FastAPI app (routes + server)
+├── analyzer.py          # Core NLP engine (hybrid similarity model)
+├── templates/
+│   └── index.html       # UI (Tailwind + Lucide icons)
+├── static/              # Optional assets
+├── requirements.txt
+└── README.md
+```
 
-def preprocess(text: str) -> str:
-    """Lowercase and strip punctuation for the Vectorizers."""
-    text = text.lower()
-    text = re.sub(r"[^a-z\s]", " ", text)
-    tokens = [t for t in text.split() if len(t) > 1 or t in ["a", "i"]]
-    return " ".join(tokens)
+---
 
+## 🚀 Setup & Run
 
-def get_hybrid_tfidf_similarities(known_texts: list, test_text: str) -> tuple:
-    """Calculates both Word-level and Character-level TF-IDF similarities."""
-    author_profile = " ".join(preprocess(t) for t in known_texts)
-    test_processed = preprocess(test_text)
+### 1. Create virtual environment (recommended)
 
-    if not author_profile.strip() or not test_processed.strip(): return 0.0, 0.0
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-    try:
-        word_vec = TfidfVectorizer(analyzer="word", ngram_range=(1, 2), min_df=1, sublinear_tf=True)
-        w_matrix = word_vec.fit_transform([author_profile, test_processed])
-        word_sim = float(cosine_similarity(w_matrix[0:1], w_matrix[1:2])[0][0])
-    except: word_sim = 0.0
+### 2. Install dependencies
 
-    try:
-        char_vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 4), min_df=1, sublinear_tf=True)
-        c_matrix = char_vec.fit_transform([author_profile, test_processed])
-        char_sim = float(cosine_similarity(c_matrix[0:1], c_matrix[1:2])[0][0])
-    except: char_sim = 0.0
+```bash
+pip install -r requirements.txt
+```
 
-    return word_sim, char_sim
+### 3. Run the server
 
+```bash
+uvicorn main:app --reload --port 8000
+```
 
-def get_bit_profile(text: str, n: int = 11) -> dict:
-    """Extracts normalized 11-bit sequences from raw text encoding."""
-    binary_str = ''.join(format(byte, '08b') for byte in text.encode('utf-8'))
-    if len(binary_str) < n: return {}
-    
-    ngrams = [binary_str[i:i+n] for i in range(len(binary_str) - n + 1)]
-    counts = Counter(ngrams)
-    total = len(ngrams)
-    return {k: v / total for k, v in counts.items()}
+### 4. Open in browser
 
-def profile_intersection(prof1: dict, prof2: dict) -> float:
-    """Calculates Exact Histogram Intersection. Much stricter than Euclidean."""
-    keys = set(prof1.keys()).union(set(prof2.keys()))
-    return sum(min(prof1.get(k, 0.0), prof2.get(k, 0.0)) for k in keys)
+```
+http://localhost:8000
+```
 
+---
 
+## 🔗 API Endpoints
 
-def classify(similarity: float):
-    if similarity >= 0.55:
-        return ("Same Author", "High", "green",
-                "Forensic match. Vocabulary, syntax, and bit-level encoding habits align strongly.")
-    elif similarity >= 0.40:
-        return ("Possibly Same", "Medium", "yellow",
-                "Moderate stylometric overlap. Shared structural patterns, but differing vocabulary or topics.")
-    elif similarity >= 0.25:
-        return ("Possibly Not Same", "Low", "orange",
-                "Weak forensic footprint. Minor structural similarities exist, but core bit-level and syntax markers diverge.")
-    else:
-        return ("Different Author", "High", "red",
-                "Authorship rejected. Significant divergence across vocabulary, syntax, and binary footprint.")
+| Method | Route      | Description                 |
+| ------ | ---------- | --------------------------- |
+| GET    | `/`        | Render UI                   |
+| POST   | `/analyze` | Perform authorship analysis |
 
-def analyze(known_texts: list, test_text: str) -> dict:
-    test_features = extract_features(test_text)
-    known_features_list = [extract_features(t) for t in known_texts]
-    avg_known = {k: round(sum(f[k] for f in known_features_list)/len(known_features_list), 2) for k in test_features.keys()}
+---
 
-    word_sim, char_sim = get_hybrid_tfidf_similarities(known_texts, test_text)
-    
+## 📥 Request Format (POST `/analyze`)
 
-    macro_tfidf_sim = (word_sim * 0.30) + (char_sim * 0.70)
+### Form Data
 
-    combined_known = " ".join(known_texts)
-    known_bit_prof = get_bit_profile(combined_known, 11)
-    test_bit_prof = get_bit_profile(test_text, 11)
-    
-    raw_bit_sim = profile_intersection(known_bit_prof, test_bit_prof)
-    
+| Field       | Type   | Description                    |
+| ----------- | ------ | ------------------------------ |
+| known_texts | list   | Multiple known writing samples |
+| test_text   | string | Text to verify                 |
 
-    scaled_bit_sim = max(0.0, min(1.0, (raw_bit_sim - 0.60) / 0.30))
+---
 
+## 📤 Response
 
-    final_similarity = (macro_tfidf_sim * 0.60) + (scaled_bit_sim * 0.40)
-    
-    label, confidence, color, explanation = classify(final_similarity)
+```json
+{
+  "similarity_score": 0.68,
+  "tfidf_score": 0.62,
+  "structural_score": 0.74,
+  "label": "Same Author",
+  "confidence": "High",
+  "color": "green",
+  "explanation": "...",
+  "sample_count": 3,
+  "known_features": {...},
+  "test_features": {...}
+}
+```
 
-    return {
-        "label": label,
-        "confidence": confidence,
-        "color": color,
-        "explanation": explanation,
-        "similarity_score": round(final_similarity, 4), 
-        "tfidf_score": round(macro_tfidf_sim, 4),        # UI: TF-IDF Vector (Combined Word/Char)
-        "structural_score": round(scaled_bit_sim, 4),    # UI: Structural (Bit-Level)
-        "sample_count": len(known_texts),               
-        "known_features": avg_known,
-        "test_features": test_features,
-    }
+---
+
+## 🧠 How It Works
+
+### 1. Preprocessing
+
+* Lowercasing
+* Regex-based tokenization
+* Noise removal
+
+---
+
+### 2. Feature Extraction
+
+Human-readable features for explainability:
+
+* Word count
+* Sentence count
+* Average sentence length
+* Vocabulary richness
+* Punctuation density
+
+---
+
+### 3. Hybrid Similarity Engine
+
+#### 🔹 Word-Level TF-IDF
+
+Captures:
+
+* Vocabulary usage
+* Common phrases
+
+#### 🔹 Character n-grams (char_wb)
+
+Captures:
+
+* Writing rhythm
+* Morphological patterns
+* Suffix/prefix habits
+
+#### 🔹 Bit-Level Fingerprinting
+
+Encodes text into binary and extracts:
+
+* Micro-level stylistic signatures
+* Encoding-level consistency
+
+📌 From your implementation: 
+
+---
+
+### 4. Scoring Model
+
+```text
+TF-IDF Score = 30% word + 70% char
+Final Score  = 60% TF-IDF + 40% Bit-level
+```
+
+---
+
+### 5. Classification
+
+| Score Range | Label             |
+| ----------- | ----------------- |
+| ≥ 0.55      | Same Author       |
+| 0.40–0.54   | Possibly Same     |
+| 0.25–0.39   | Possibly Not Same |
+| < 0.25      | Different Author  |
+
+---
+
+## 🎨 UI Features
+
+Modern dark interface with:
+
+* Tailwind CSS styling
+* Lucide icons
+* Responsive grid layout
+* Dynamic result visualization
+* Animated similarity bar
+* Feature comparison dashboard
+
+📌 UI implementation: 
+
+---
+
+## 🧪 Example Use Cases
+
+* Detect AI-generated (deepfake) text
+* Verify authorship of documents
+* Compare writing styles across users
+* Stylometric analysis for research
+
+---
+
+## 🧠 Key Concepts
+
+* Stylometry
+* N-grams
+* TF-IDF Vector Space Model
+* Cosine Similarity
+* Feature-based NLP
+
+---
+
+## ⚠️ Limitations
+
+* Not a perfect AI detector
+* Sensitive to text length
+* Works best with ≥ 3 samples per author
+* Topic similarity can affect results
+
+---
+
+## 💡 Future Improvements
+
+* Add semantic embeddings (optional ML upgrade)
+* Improve threshold tuning dynamically
+* Add multi-author classification
+* Visualization of feature importance
+
+---
+
+## 🏷️ Project Title (Academic)
+
+**Stylometric Authorship Verification using Hybrid NLP Techniques**
+
+---
+
+## ✨ Tagline
+
+> “Every writer leaves a signature — InkID finds it.”

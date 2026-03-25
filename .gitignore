@@ -1,0 +1,79 @@
+# Byte-compiled / optimized / DLL files
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+
+venv/
+.env/
+.venv/
+
+# Environment variables
+
+.env
+.env.*
+
+# Distribution / packaging
+
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Installer logs
+
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+
+htmlcov/
+.coverage
+.coverage.*
+.cache
+pytest_cache/
+
+# Jupyter Notebook
+
+.ipynb_checkpoints/
+
+# VS Code
+
+.vscode/
+
+# PyCharm
+
+.idea/
+
+# Mac / Linux system files
+
+.DS_Store
+*.swp
+*.swo
+
+# Logs
+
+*.log
+
+# SQLite database (if you use one)
+
+*.sqlite3
+
+# FastAPI / Uvicorn
+
+*.pid
+
+# NLTK data (optional, if local)
+
+nltk_data/
+
+# Node (if you accidentally mix frontend)
+
+node_modules/
+
+# Temporary files
+
+tmp/
+temp/

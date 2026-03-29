@@ -1,9 +1,9 @@
-    <!DOCTYPE html>
-    <html lang="en" class="antialiased">
-    <head>
+<!DOCTYPE html>
+<html lang="en" class="antialiased">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InkID</title>
+    <title>InkID | Forensic Analyzer</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,370 +14,252 @@
     
     <script>
         tailwind.config = {
-        theme: {
-            extend: {
-            fontFamily: {
-                sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                mono: ['"JetBrains Mono"', 'monospace'],
-            },
-            colors: {
-                gray: tailwind.colors.zinc,
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: { gray: tailwind.colors.zinc }
+                }
             }
-            }
-        }
         }
     </script>
     
     <style>
-        /* Custom Scrollbar for textareas */
-        textarea::-webkit-scrollbar { width: 8px; }
-        textarea::-webkit-scrollbar-track { background: transparent; }
-        textarea::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
-        textarea::-webkit-scrollbar-thumb:hover { background: #52525b; }
-        
-        /* Smooth reveal animations */
         .reveal { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes slideUp {
-        from { opacity: 0; transform: translateY(15px); }
-        to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .ai-glow { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
     </style>
-    </head>
-    
-    <body class="bg-[#09090b] text-gray-300 min-h-screen selection:bg-indigo-500/30">
-    
+</head>
+
+<body class="bg-[#09090b] text-gray-300 min-h-screen selection:bg-indigo-500/30">
+
     <div class="max-w-6xl mx-auto px-6 py-16 md:py-24">
         
         <header class="mb-12 text-center">
-        <!--<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-900 border border-gray-800 text-xs font-mono text-gray-400 mb-6">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-indigo-400"></i>
-            Authorship Verification System
-        </div>-->
-        <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
-            InkID
-        </h1>
-        <p class="text-gray-500 max-w-lg mx-auto text-xs md:text-sm leading-relaxed tracking-wide uppercase opacity-80">
-            Advanced stylometric attribution engine. Utilizing hybrid TF-IDF architectures 
-            and binary intersection mapping to identify unique linguistic signatures.
-        </p>
+            <h1 class="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">InkID</h1>
+            <p class="text-gray-500 max-w-lg mx-auto text-xs md:text-sm leading-relaxed tracking-widest uppercase opacity-80">
+                Linguistic Attribution // HC3 Calibrated Stats
+            </p>
         </header>
     
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        
-        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 flex flex-col">
-            <div class="flex items-center gap-3 mb-6">
-            <div class="p-2 bg-indigo-500/10 rounded-lg shrink-0">
-                <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-400"></i>
-            </div>
-            <div>
-                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Known Author Profile</h2>
-                <p class="text-[11px] text-gray-500 mt-0.5">Provide verified writing samples.</p>
-            </div>
-            </div>
-    
-            <div id="samples-container" class="space-y-4 flex-1">
-            <div class="sample-wrap relative group flex flex-col h-full" data-index="0">
-                <div class="flex justify-between items-center mb-2">
-                <label class="text-[10px] font-mono tracking-widest text-gray-500">SAMPLE 01</label>
-                <button onclick="removeSample(this)" class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/10 text-red-400 rounded" title="Remove sample">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </button>
+            <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 flex flex-col">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-indigo-500/10 rounded-lg shrink-0">
+                        <i data-lucide="fingerprint" class="w-5 h-5 text-indigo-400"></i>
+                    </div>
+                    <div><h2 class="text-sm font-bold text-white uppercase tracking-wider">Known Author Profile</h2></div>
                 </div>
-                <textarea name="known_texts" rows="8" 
-                class="w-full flex-1 bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 placeholder-gray-700 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 outline-none transition-all resize-y"
-                placeholder="Paste verified text here..."
-                >The development of artificial intelligence raises profound questions about the nature of consciousness and cognition. When we consider the intricate web of neural connections within the human brain, we must acknowledge that our understanding remains fundamentally incomplete. Language itself becomes a mirror reflecting thought patterns, vocabulary preferences, and the subtle rhythms unique to each individual writer.</textarea>
-            </div>
+                <div id="samples-container" class="space-y-4 flex-1">
+                    <div class="sample-wrap relative group flex flex-col h-full">
+                        <label class="text-[10px] font-mono tracking-widest text-gray-500 mb-2">SAMPLE 01</label>
+                        <textarea name="known_texts" rows="8" class="w-full flex-1 bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 focus:border-indigo-500/50 outline-none transition-all" placeholder="Paste known human writing..."></textarea>
+                    </div>
+                </div>
+                <button onclick="addSample()" class="mt-4 w-full justify-center inline-flex items-center gap-2 text-xs font-mono text-indigo-400 hover:text-indigo-300 transition-colors py-3 px-3 rounded-lg border border-dashed border-indigo-500/30 hover:bg-indigo-500/10">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Add sample
+                </button>
             </div>
     
-            <button onclick="addSample()" class="mt-4 w-full justify-center inline-flex items-center gap-2 text-xs font-mono text-indigo-400 hover:text-indigo-300 transition-colors py-3 px-3 rounded-lg border border-dashed border-indigo-500/30 hover:bg-indigo-500/10">
-            <i data-lucide="plus" class="w-4 h-4"></i> Add another sample
-            </button>
-        </div>
-    
-        <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 flex flex-col">
-            <div class="flex items-center gap-3 mb-6">
-            <div class="p-2 bg-emerald-500/10 rounded-lg shrink-0">
-                <i data-lucide="file-search" class="w-5 h-5 text-emerald-400"></i>
-            </div>
-            <div>
-                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Unknown Document</h2>
-                <p class="text-[11px] text-gray-500 mt-0.5">The text you wish to verify against the profile.</p>
-            </div>
-            </div>
-            
-            <div class="flex flex-col flex-1">
-            <label class="text-[10px] font-mono tracking-widest text-gray-500 mb-2">TEST TEXT</label>
-            <textarea id="test-text" 
-                class="w-full flex-1 min-h-[250px] bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 placeholder-gray-700 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 outline-none transition-all resize-y"
-                placeholder="Paste the text in question here..."
-            >Artificial intelligence presents us with deeply challenging philosophical dilemmas regarding the essence of awareness and mental processes. Examining the complex network of synaptic pathways inside the human mind compels us to recognize that our comprehension is still fundamentally lacking. Written communication acts as a reflection of cognitive tendencies, lexical choices, and the distinctive cadence particular to every individual author.</textarea>
+            <div class="bg-gray-900/50 border border-gray-800 rounded-2xl p-6 flex flex-col">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-emerald-500/10 rounded-lg shrink-0">
+                        <i data-lucide="file-search" class="w-5 h-5 text-emerald-400"></i>
+                    </div>
+                    <div><h2 class="text-sm font-bold text-white uppercase tracking-wider">Test Document</h2></div>
+                </div>
+                <div class="flex flex-col flex-1">
+                    <label class="text-[10px] font-mono tracking-widest text-gray-500 mb-2">UNKNOWN TEXT</label>
+                    <textarea id="test-text" class="w-full flex-1 min-h-[250px] bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 focus:border-emerald-500/50 outline-none transition-all" placeholder="Paste the suspect text here..."></textarea>
+                </div>
             </div>
         </div>
-    
-        </div>
-        <div id="error-box" class="hidden mb-8 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-3">
-        <i data-lucide="alert-circle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
-        <p id="error-msg" class="text-sm font-mono text-red-400"></p>
-        </div>
-    
-        <button id="analyze-btn" onclick="analyze()" class="w-full bg-white text-black hover:bg-gray-200 font-semibold py-4 rounded-xl transition-all flex items-center justify-center gap-2">
-        <i data-lucide="cpu" class="w-5 h-5"></i>
-        <span id="btn-text">Execute Analysis</span>
-        <i data-lucide="loader-2" id="spinner" class="w-5 h-5 animate-spin hidden"></i>
+
+        <button id="analyze-btn" onclick="analyze()" class="w-full bg-white text-black hover:bg-gray-200 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+            <span id="btn-text">RUN ANALYSIS</span>
+            <i data-lucide="loader-2" id="spinner" class="w-5 h-5 animate-spin hidden"></i>
         </button>
     
-        <div id="result" class="hidden mt-12 max-w-4xl mx-auto">
-        <div class="h-px w-full bg-gradient-to-r from-transparent via-gray-800 to-transparent mb-12"></div>
-        
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-10 reveal shadow-2xl">
-            
-            <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-10">
-            <div>
-                <label class="text-[10px] font-mono tracking-widest text-gray-500 uppercase">Analysis Verdict</label>
-                <h3 id="verdict-text" class="text-3xl md:text-4xl font-bold mt-1 tracking-tight">—</h3>
-                <p id="explanation-text" class="text-sm text-gray-400 mt-4 max-w-md leading-relaxed border-l-2 border-gray-800 pl-4"></p>
-            </div>
-            
-            <div class="flex flex-col items-end gap-2">
-                <span id="conf-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider border">—</span>
-                <span class="text-[10px] font-mono text-gray-500 uppercase">Confidence Level</span>
-            </div>
-            </div>
-    
-            <div class="mb-12">
-            <div class="flex justify-between items-end mb-3">
-                <span class="text-xs font-mono tracking-widest text-gray-500 uppercase">Stylometric Match</span>
-                <span id="score-pct" class="text-2xl font-bold font-mono">—</span>
-            </div>
-            <div class="h-2 w-full bg-gray-950 rounded-full overflow-hidden border border-gray-800/50">
-                <div id="bar-fill" class="h-full w-0 transition-all duration-1000 ease-out rounded-full"></div>
-            </div>
-            </div>
-    
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
-                <p class="text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-1">Bit-Level Vector</p>
-                <p id="tfidf-score" class="text-lg font-mono text-white font-semibold">—</p>
-            </div>
-            <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
-                <p class="text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-1">Structural</p>
-                <p id="struct-score" class="text-lg font-mono text-white font-semibold">—</p>
-            </div>
-            <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
-                <p class="text-[10px] font-mono text-gray-500 uppercase tracking-wider mb-1">Samples</p>
-                <p id="sample-count" class="text-lg font-mono text-white font-semibold">—</p>
-            </div>
-            <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
-                <p class="text-[10px] font-mono text-indigo-400 uppercase tracking-wider mb-1">Blend Score</p>
-                <p id="blended-val" class="text-lg font-mono text-indigo-400 font-bold">—</p>
-            </div>
-            </div>
-    
-            <div class="h-px w-full bg-gray-800 mb-10"></div>
-    
-            <div>
-            <div class="flex items-center gap-3 mb-6">
-                <i data-lucide="bar-chart-2" class="w-5 h-5 text-gray-400"></i>
-                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Feature Breakdown</h4>
-            </div>
-            
-            <div class="flex gap-6 mb-6">
-                <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider">Profile Base</span>
+        <div id="result" class="hidden mt-12 max-w-6xl mx-auto space-y-6 reveal">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-10 shadow-2xl">
+                    <div class="flex justify-between items-start mb-10">
+                        <div>
+                            <label class="text-[10px] font-mono text-gray-500 uppercase">Verdict</label>
+                            <h3 id="verdict-text" class="text-3xl font-bold mt-1">—</h3>
+                            <p id="explanation-text" class="text-sm text-gray-400 mt-4 max-w-md leading-relaxed"></p>
+                        </div>
+                        <span id="conf-badge" class="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase border">—</span>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="flex justify-between mb-3">
+                            <span class="text-xs font-mono text-gray-500 uppercase">Match Score</span>
+                            <span id="score-pct" class="text-2xl font-bold font-mono">—</span>
+                        </div>
+                        <div class="h-2 w-full bg-gray-950 rounded-full overflow-hidden border border-gray-800/50">
+                            <div id="bar-fill" class="h-full w-0 transition-all duration-1000 ease-out rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
+                            <p class="text-[10px] font-mono text-gray-500 uppercase mb-1">Char TF-IDF</p>
+                            <p id="char-score" class="text-lg font-mono text-white font-semibold">—</p>
+                        </div>
+                        <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
+                            <p class="text-[10px] font-mono text-gray-500 uppercase mb-1">Word TF-IDF</p>
+                            <p id="word-score" class="text-lg font-mono text-white font-semibold">—</p>
+                        </div>
+                        <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
+                            <p class="text-[10px] font-mono text-gray-500 uppercase mb-1">Samples</p>
+                            <p id="sample-count" class="text-lg font-mono text-white font-semibold">—</p>
+                        </div>
+                        <div class="bg-[#09090b] border border-gray-800 rounded-xl p-4">
+                            <p class="text-[10px] font-mono text-indigo-400 uppercase mb-1">Blended</p>
+                            <p id="blended-val" class="text-lg font-mono text-indigo-400 font-bold">—</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span class="text-[10px] font-mono text-gray-400 uppercase tracking-wider">Test Text</span>
-                </div>
-            </div>
-    
-            <div id="features-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+                <div id="ai-card" class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl flex flex-col ai-glow">
+                    <div class="flex items-center gap-2 mb-6">
+                        <i data-lucide="bot" class="w-5 h-5 text-indigo-400"></i>
+                        <h4 class="text-xs font-bold text-white uppercase tracking-wider">AI Content Analysis</h4>
+                    </div>
+                    <div class="text-center py-6 flex-1">
+                        <div class="relative inline-flex items-center justify-center">
+                            <svg class="w-32 h-32 transform -rotate-90">
+                                <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-gray-800" />
+                                <circle id="ai-circle" cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
+                                        stroke-dasharray="364.4" stroke-dashoffset="364.4"
+                                        class="text-indigo-500 transition-all duration-1000 ease-out" />
+                            </svg>
+                            <span id="ai-pct" class="absolute text-2xl font-bold font-mono text-white">0%</span>
+                        </div>
+                        <p id="ai-verdict-label" class="mt-4 text-xs font-mono uppercase tracking-widest text-gray-500">—</p>
+                        <p id="ai-conf-text" class="text-[9px] font-mono text-gray-600 mt-1 uppercase">—</p>
+                    </div>
+                    <div class="space-y-2 mt-4 pt-4 border-t border-gray-800">
+                        <div class="flex justify-between text-[10px] font-mono"><span class="text-gray-500 uppercase">Entropy</span><span id="sig-entropy" class="text-indigo-400">—</span></div>
+                        <div class="flex justify-between text-[10px] font-mono"><span class="text-gray-500 uppercase">Variance</span><span id="sig-variance" class="text-indigo-400">—</span></div>
+                    </div>
                 </div>
             </div>
-    
+
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <h4 class="text-sm font-bold text-white uppercase tracking-wider mb-6">Feature Breakdown</h4>
+                <div id="features-grid" class="grid grid-cols-2 md:grid-cols-5 gap-3"></div>
+            </div>
         </div>
-        </div>
-    
-        <!--<footer class="mt-20 text-center flex flex-col items-center gap-4">
-        <i data-lucide="binary" class="w-5 h-5 text-gray-700"></i>
-        <p class="text-[10px] font-mono text-gray-600 tracking-widest uppercase">
-            Engineered with FastAPI &middot; Stylometry Module v2.0
-        </p>
-        </footer>-->
-    
     </div>
     
     <script>
         lucide.createIcons();
-    
-        let sampleCount = 1;
-    
         function addSample() {
-        sampleCount++;
-        const container = document.getElementById('samples-container');
-        const div = document.createElement('div');
-        div.className = 'sample-wrap relative group mt-4 reveal flex flex-col h-full';
-        div.dataset.index = sampleCount - 1;
-        
-        div.innerHTML = `
-            <div class="flex justify-between items-center mb-2">
-            <label class="text-[10px] font-mono tracking-widest text-gray-500">SAMPLE ${String(sampleCount).padStart(2,'0')}</label>
-            <button onclick="removeSample(this)" class="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/10 text-red-400 rounded" title="Remove sample">
-                <i data-lucide="x" class="w-3.5 h-3.5"></i>
-            </button>
-            </div>
-            <textarea name="known_texts" rows="4" 
-            class="w-full flex-1 bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 placeholder-gray-700 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 outline-none transition-all resize-y"
-            placeholder="Paste another verified text here..."
-            ></textarea>
-        `;
-        
-        container.appendChild(div);
-        lucide.createIcons();
-        div.querySelector('textarea').focus();
+            const container = document.getElementById('samples-container');
+            const div = document.createElement('div');
+            div.className = 'sample-wrap relative group mt-4 reveal flex flex-col h-full';
+            div.innerHTML = `<div class="flex justify-between items-center mb-2"><label class="text-[10px] font-mono tracking-widest text-gray-500 uppercase">ADDITIONAL SAMPLE</label><button onclick="this.closest('.sample-wrap').remove()" class="p-1 hover:bg-red-500/10 text-red-400 rounded"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div><textarea name="known_texts" rows="4" class="w-full flex-1 bg-[#09090b] border border-gray-800 rounded-xl p-4 text-sm font-mono text-gray-200 focus:border-indigo-500/50 outline-none transition-all"></textarea>`;
+            container.appendChild(div);
+            lucide.createIcons();
         }
-    
-        function removeSample(btn) {
-        const wrap = btn.closest('.sample-wrap');
-        const all = document.querySelectorAll('.sample-wrap');
-        if (all.length <= 1) return;
-        
-        wrap.style.opacity = '0';
-        wrap.style.transform = 'translateY(-10px)';
-        wrap.style.transition = 'all 0.2s';
-        setTimeout(() => wrap.remove(), 200);
-        }
-    
+
         async function analyze() {
-        const btn = document.getElementById('analyze-btn');
-        const spinner = document.getElementById('spinner');
-        const btnText = document.getElementById('btn-text');
-        const errorBox = document.getElementById('error-box');
-        const resultDiv = document.getElementById('result');
-        const cpuIcon = btn.querySelector('[data-lucide="cpu"]');
-    
-        const knownTextareas = document.querySelectorAll('[name="known_texts"]');
-        const testText = document.getElementById('test-text').value.trim();
-        const knownTexts = [...knownTextareas].map(t => t.value.trim()).filter(Boolean);
-    
-        errorBox.classList.add('hidden');
-        resultDiv.classList.add('hidden');
-    
-        if (!knownTexts.length || !testText) {
-            document.getElementById('error-msg').textContent = 'Error: Missing baseline samples or test document.';
-            errorBox.classList.remove('hidden');
-            return;
-        }
-    
-        btn.disabled = true;
-        btn.classList.add('opacity-75', 'cursor-not-allowed');
-        cpuIcon.classList.add('hidden');
-        spinner.classList.remove('hidden');
-        btnText.textContent = 'Processing Vectors...';
-    
-        try {
-            const formData = new FormData();
-            knownTexts.forEach(t => formData.append('known_texts', t));
-            formData.append('test_text', testText);
-    
-            const res = await fetch('/analyze', { method: 'POST', body: formData });
-            const data = await res.json();
-    
-            if (data.error) {
-            document.getElementById('error-msg').textContent = data.error;
-            errorBox.classList.remove('hidden');
-            return;
+            const btn = document.getElementById('analyze-btn');
+            const spinner = document.getElementById('spinner');
+            const knownTexts = [...document.querySelectorAll('[name="known_texts"]')].map(t => t.value.trim()).filter(Boolean);
+            const testText = document.getElementById('test-text').value.trim();
+
+            if (!knownTexts.length || !testText) return alert("Missing samples or test text.");
+            btn.disabled = true; spinner.classList.remove('hidden');
+
+            try {
+                const formData = new FormData();
+                knownTexts.forEach(t => formData.append('known_texts', t));
+                formData.append('test_text', testText);
+                
+                const res = await fetch('/analyze', { method: 'POST', body: formData });
+                if (!res.ok) throw new Error("Server Error");
+                renderResult(await res.json());
+            } catch (e) {
+                console.error(e);
+                alert("Error during analysis. Check terminal.");
+            } finally {
+                btn.disabled = false; spinner.classList.add('hidden');
             }
-    
-            renderResult(data);
-        } catch (e) {
-            document.getElementById('error-msg').textContent = 'Connection failure. Analyzer endpoint unreachable.';
-            errorBox.classList.remove('hidden');
-        } finally {
-            btn.disabled = false;
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
-            cpuIcon.classList.remove('hidden');
-            spinner.classList.add('hidden');
-            btnText.textContent = 'Execute Analysis';
         }
-        }
+
+       function renderResult(d) {
+    console.log("Rendering Result:", d);
+    const resultDiv = document.getElementById('result');
+    if (!resultDiv) return;
+    resultDiv.classList.remove('hidden');
     
-        function renderResult(d) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.classList.remove('hidden');
-        
-        // Theme settings based on result color
-                const themes = {
-                green:  { text: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', fill: 'bg-emerald-500' },
-                yellow: { text: 'text-amber-400',   bg: 'bg-amber-500/10',   border: 'border-amber-500/20',   fill: 'bg-amber-500' },
-                orange: { text: 'text-orange-400',  bg: 'bg-orange-500/10',  border: 'border-orange-500/20',  fill: 'bg-orange-500' },
-                red:    { text: 'text-rose-400',    bg: 'bg-rose-500/10',    border: 'border-rose-500/20',    fill: 'bg-rose-500' }
-                };
-        const t = themes[d.color] || themes.red;
+    // Themes
+    const themes = { green: 'text-emerald-400', yellow: 'text-amber-400', orange: 'text-orange-400', red: 'text-rose-400' };
+    const themeClass = themes[d.color] || themes.red;
+
+    // Authorship - Use hyphens to match HTML IDs
+    document.getElementById('verdict-text').textContent = d.label || "N/A";
+    document.getElementById('verdict-text').className = `text-3xl font-bold mt-1 tracking-tight ${themeClass}`;
+    document.getElementById('explanation-text').textContent = d.explanation || "";
+    document.getElementById('conf-badge').textContent = (d.confidence || "LOW") + ' CONFIDENCE';
     
-        const verdictEl = document.getElementById('verdict-text');
-        verdictEl.textContent = d.label;
-        verdictEl.className = `text-3xl md:text-4xl font-bold mt-1 tracking-tight ${t.text}`;
-        document.getElementById('explanation-text').textContent = d.explanation;
+    const pct = Math.round((d.similarity_score || 0) * 100);
+    document.getElementById('score-pct').textContent = pct + '%';
+    document.getElementById('bar-fill').style.width = pct + '%';
+    document.getElementById('bar-fill').className = `h-full transition-all duration-1000 ${pct > 50 ? 'bg-emerald-500' : 'bg-rose-500'}`;
+
+    // Detail Stats - Ensure these IDs exist in your HTML
+    if (document.getElementById('char-score')) 
+        document.getElementById('char-score').textContent = (d.char_score * 100).toFixed(1) + '%';
+    if (document.getElementById('word-score')) 
+        document.getElementById('word-score').textContent = (d.word_score * 100).toFixed(1) + '%';
+    if (document.getElementById('sample-count')) 
+        document.getElementById('sample-count').textContent = d.sample_count || 0;
+    if (document.getElementById('blended-val')) 
+        document.getElementById('blended-val').textContent = pct + '%';
+
+    // AI Section
+    const aiVal = Math.round((d.ai_probability || 0) * 100);
+    document.getElementById('ai-pct').textContent = aiVal + '%';
+    document.getElementById('ai-circle').style.strokeDashoffset = 364.4 - (aiVal / 100) * 364.4;
+    document.getElementById('ai-verdict-label').textContent = d.ai_label || "No Result";
+    document.getElementById('ai-conf-text').textContent = d.ai_confidence || "";
     
-        const confBadge = document.getElementById('conf-badge');
-        confBadge.textContent = d.confidence;
-        confBadge.className = `px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider ${t.bg} ${t.border} ${t.text}`;
+    if (d.ai_signals) {
+        document.getElementById('sig-entropy').textContent = d.ai_signals.word_entropy || 'N/A';
+        document.getElementById('sig-variance').textContent = d.ai_signals.sentence_variance || 'N/A';
+    }
+
+    // Grid Comparison
+    const grid = document.getElementById('features-grid');
+    grid.innerHTML = '';
+    const labels = { word_count: 'Words', avg_sentence_length: 'S-Len', avg_word_length: 'W-Len', lexical_diversity: 'Richness', punct_density: 'Punct' };
     
-        const pct = Math.round(d.similarity_score * 100);
-        const scorePctEl = document.getElementById('score-pct');
-        scorePctEl.textContent = pct + '%';
-        scorePctEl.className = `text-2xl font-bold font-mono ${t.text}`;
-        
-        const barFill = document.getElementById('bar-fill');
-        barFill.className = `h-full w-0 transition-all duration-1000 ease-out rounded-full ${t.fill}`;
-        
-        setTimeout(() => { barFill.style.width = pct + '%'; }, 100);
-    
-        document.getElementById('tfidf-score').textContent = (d.tfidf_score * 100).toFixed(1) + '%';
-        document.getElementById('struct-score').textContent = (d.structural_score * 100).toFixed(1) + '%';
-        document.getElementById('sample-count').textContent = d.sample_count;
-        document.getElementById('blended-val').textContent = (d.similarity_score * 100).toFixed(1) + '%';
-    
-        const grid = document.getElementById('features-grid');
-        grid.innerHTML = '';
-        
-        const featureLabels = {
-            word_count: 'Word Count',
-            sentence_count: 'Sentences',
-            avg_sentence_length: 'Avg Sent Len',
-            avg_word_length: 'Avg Word Len',
-            vocabulary_richness: 'Vocab Richness',
-            punctuation_density: 'Punct. Density',
-            unique_words: 'Unique Words',
-        };
-    
-        for (const [key, label] of Object.entries(featureLabels)) {
-            const kv = d.known_features[key] ?? '—';
-            const tv = d.test_features[key] ?? '—';
-            
-            const formatVal = (v) => {
-                if(typeof v !== 'number') return v;
-                return (key.includes('density') || key.includes('richness') || key.includes('length')) ? v.toFixed(2) : v.toFixed(0);
-            };
-    
-            const item = document.createElement('div');
-            item.className = 'bg-[#09090b] border border-gray-800 rounded-xl p-3 flex flex-col justify-between';
-            item.innerHTML = `
-            <div class="text-[9px] font-mono text-gray-500 uppercase tracking-widest mb-2">${label}</div>
+    Object.entries(labels).forEach(([key, label]) => {
+        const kv = d.known_features ? d.known_features[key] : 0;
+        const tv = d.test_features ? d.test_features[key] : 0;
+        const item = document.createElement('div');
+        item.className = 'bg-[#09090b] border border-gray-800 rounded-xl p-3';
+        item.innerHTML = `
+            <div class="text-[9px] font-mono text-gray-500 uppercase mb-2">${label}</div>
             <div class="flex items-end justify-between">
-                <span class="text-sm font-mono font-semibold text-indigo-300">${formatVal(kv)}</span>
-                <span class="text-[10px] text-gray-700 mx-1">/</span>
-                <span class="text-sm font-mono font-semibold text-emerald-300">${formatVal(tv)}</span>
-            </div>
-            `;
-            grid.appendChild(item);
-        }
-    
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+                <span class="text-xs font-mono text-indigo-400">${kv}</span>
+                <span class="text-xs font-mono text-emerald-400">${tv}</span>
+            </div>`;
+        grid.appendChild(item);
+    });
+
+    resultDiv.scrollIntoView({ behavior: 'smooth' });
+}
     </script>
-    </body>
-    </html>
+</body>
+</html>

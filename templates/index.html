@@ -212,7 +212,7 @@
     document.getElementById('explanation-text').textContent = d.explanation || "";
     document.getElementById('conf-badge').textContent = (d.confidence || "LOW") + ' CONFIDENCE';
     
-    const pct = Math.round((d.similarity_score || 0) * 100);
+    const pct = Math.round((d.similarity|| 0) * 100);
     document.getElementById('score-pct').textContent = pct + '%';
     document.getElementById('bar-fill').style.width = pct + '%';
     document.getElementById('bar-fill').className = `h-full transition-all duration-1000 ${pct > 50 ? 'bg-emerald-500' : 'bg-rose-500'}`;
